@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthPredict AI | Disease Risk Predictor</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #38b000;
+            --warning: #ffaa00;
+            --danger: #d90429;
+            --info: #4cc9f0;
+            --gray: #adb5bd;
+            --gray-dark: #495057;
+            --gray-light: #e9ecef;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .logo-icon {
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 20px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+        
+        .hero {
+            padding: 3rem 0;
+            background: url('https://images.unsplash.com/photo-1505751172876-fa1923c5c528?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80') center/cover;
+            background-blend-mode: overlay;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .btn-outline:hover {
+            background-color: white;
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-container {
+            margin-bottom: 2rem;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--gray-light);
+        }
+        
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            background-color: white;
+        }
+        
+        .tab.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--gray-dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--gray-light);
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+        
+        .result.positive {
+            background-color: rgba(217, 4, 41, 0.1);
+            border: 1px solid var(--danger);
+        }
+        
+        .result.negative {
+            background-color: rgba(56, 176, 0, 0.1);
+            border: 1px solid var(--success);
+        }
+        
+        .result-heading {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .result-text {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .gauge-container {
+            width: 200px;
+            height: 100px;
+            margin: 0 auto 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .gauge {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 10px solid var(--gray-light);
+            border-top-color: var(--primary);
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: center;
+        }
+        
+        .gauge-value {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .info-list {
+            margin-top: 1rem;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-icon {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .feature-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+        
+        .feature-icon {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .section {
+            padding: 3rem 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .section-title:after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 4px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            margin: 1rem auto 0;
+            border-radius: 2px;
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            margin: 1rem 0;
+        }
+        
+        .footer-links li {
+            margin: 0 1rem;
+        }
+        
+        .footer-links a {
+            color: var(--gray);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .range-info {
+            background-color: var(--gray-light);
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .metrics-table th, .metrics-table td {
+            border: 1px solid var(--gray-light);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        .metrics-table th {
+            background-color: var(--gray-light);
+        }
+
+        .sample-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .sample-item {
+            padding: 0.5rem;
+            border: 1px solid var(--gray-light);
+            border-radius: 4px;
+        }
+
+        .sample-label {
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+        
+        /* New Enhancements */
+        .input-validation {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        
+        .input-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .input-info .info-tooltip {
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--dark);
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: var(--gray-light);
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        
+        .progress-bar-inner {
+            height: 100%;
+            background: linear-gradient(to right, var(--success), var(--danger));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .recommendations {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background-color: var(--gray-light);
+        }
+        
+        .recommendations h4 {
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .recommendations ul {
+            padding-left: 1.5rem;
+        }
+        
+        .recommendations li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .model-info {
+            background-color: rgba(76, 201, 240, 0.1);
+            border: 1px solid var(--info);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .model-info h4 {
+            color: var(--info);
+            margin-bottom: 0.5rem;
+        }
+        
+        .animated-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .feature-importance {
+            width: 100%;
+            height: 20px;
+            background-color: var(--gray-light);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        
+        .feature-importance-bar {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            transition: width 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <span class="logo-icon">❤</span>
+                    <span>HealthPredict AI</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#predict">Start Predicting</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Advanced Health Risk Prediction</h1>
+            <p>Using machine learning to predict diabetes and heart disease risk factors with high accuracy. Our AI models analyze your health data to provide personalized risk assessments.</p>
+            <a href="#predict" class="btn btn-primary animated-pulse">Start Prediction</a>
+            <a href="#about" class="btn btn-outline">Learn More</a>
+        </div>
+    </section>
+
+    <section class="section" id="predict">
+        <div class="container">
+            <h2 class="section-title">Health Risk Prediction</h2>
+            
+            <div class="tab-container">
+                <div class="tabs">
+                    <div class="tab active" data-tab="diabetes">Diabetes Risk</div>
+                    <div class="tab" data-tab="heart">Heart Disease Risk</div>
+                    <div class="tab" data-tab="sample">Sample Inputs</div>
+                    <div class="tab" data-tab="metrics">Model Metrics</div>
+                    <div class="tab" data-tab="how-it-works">How It Works</div>
+                </div>
+                
+                <div class="tab-content active" id="diabetes">
+                    <div class="model-info">
+                        <h4><i>ℹ️ Model Information</i></h4>
+                        <p>This prediction uses a Random Forest algorithm trained on clinical data with an accuracy of 89.2%. The model analyzes 7 key factors to assess your diabetes risk.</p>
+                    </div>
+                    
+                    <h3>Diabetes Risk Prediction</h3>
+                    <p>Enter your health information to predict your risk of diabetes. All data is processed locally in your browser and is not sent to any server.</p>
+                    
+                    <form id="diabetesForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <div class="input-info">
+                                    <label for="glucose">Glucose (mg/dL)</label>
+                                    <div class="tooltip info-tooltip">
+                                        <span>ℹ️</span>
+                                        <span class="tooltip-text">Blood glucose concentration is a key indicator for diabetes risk assessment.</span>
+                                    </div>
+                                </div>
+                                <div class="range-info">Typical range: 70-120 (fasting), up to 180 (after meals)</div>
+                                <input type="number" id="glucose" class="form-control" placeholder="Enter glucose level" required>
+                                <div class="input-validation" id="glucose-validation">Please enter a value between 70 and 200.</div>
+                                <div class="feature-importance">
+                                    <div class="feature-importance-bar" style="width: 90%;"></div>
+                                </div>
+                                <small>High importance factor</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="input-info">
+                                    <label for="bloodPressure">Blood Pressure (mm Hg)</label>
+                                    <div class="tooltip info-tooltip">
+                                        <span>ℹ️</span>
+                                        <span class="tooltip-text">Systolic blood pressure measurement.</span>
+                                    </div>
+                                </div>
+                                <div class="range-info">Typical range: 90-140 (systolic)</div>
+                                <input type="number" id="bloodPressure" class="form-control" placeholder="Enter blood pressure" required>
+                                <div class="input-validation" id="bloodPressure-validation">Please enter a value between 80 and 180.</div>
+                                <div class="feature-importance">
+                                    <div class="feature-importance-bar" style="width: 60%;"></div>
+                                </div>
+                                <small>Medium importance factor</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <div class="input-info">
+                                    <label for="skinThickness">Skin Thickness (mm)</label>
+                                    <div class="tooltip info-tooltip">
+                                        <span>ℹ️</span>
+                                        <span class="tooltip-text">Triceps skin fold thickness - a measure of body fat.</span>
+                                    </div>
+                                </div>
+                                <div class="range-info">Typical range: 20-30 at triceps</div>
+                                <input type="number" id="skinThickness" class="form-control" placeholder="Enter skin thickness" required>
+                                <div class="input-validation" id="skinThickness-validation">Please enter a value between 10 and 50.</div>
+                                <div class="feature-importance">
+                                    <div class="feature-importance-bar" style="width: 45%;"></div>
+                                </div>
+                                <small>Medium importance factor</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="input-info">
+                                    <label for="insulin">Insulin (μU/mL)</label>
+                                    <div class="tooltip info-tooltip">
+                                        <span>ℹ️</span>
+                                        <span class="tooltip-text">Serum insulin level after 2 hours.</span>
+                                    </div>
+                                </div>
+                                <div class="range-info">Typical range: < 25 (fasting)</div>
+                                <input type="number" id="insulin" class="form-control" placeholder="Enter insulin level" required>
+                                <div class="input-validation" id="insulin-validation">Please enter a value between 0 and 300.</div>
+                                <div class="feature-importance">
+                                    <div class="feature-importance-bar" style="width: 75%;"></div>
+                                </div>
+                                <small>High importance factor</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <div class="input-info">
+                                    <label for="bmi">BMI (kg/m²)</label>
+                                    <div class="tooltip info-tooltip">
+                                        <span>ℹ️</span>
+                                        <span class="tooltip-text">Body Mass Index = weight(kg)/height(m)²</span>
+                                    </div>
+                                </div>
+                                <div class="range-info">Typical range: 18.5-24.9 (normal), 25-29.9 (overweight), 30+ (obese)</div>
+                                <input type="number" id="bmi" class="form-control" placeholder="Enter BMI" required>
+                                <div class="input-validation" id="bmi-validation">Please enter a value between 18 and 40.</div>
+                                <div class="feature-importance">
+                                    <div class="feature-importance-bar" style="width: 70%;"></div>
+                                </div>
+                                <small>High importance factor</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="input-info">
+                                    <label for="diabetesPedigree">Diabetes Pedigree Function</label>
+                                    <div class="tooltip info-tooltip">
+                                        <span>ℹ️</span>
+                                        <span class="tooltip-text">Scores likelihood of diabetes based on family history.</span>
+                                    </div>
+                                </div>
+                                <div class="range-info">Typical range: 0.1-1.0</div>
+                                <input type="number" id="diabetesPedigree" class="form-control" placeholder="Enter diabetes pedigree value" step="0.01" required>
+                                <div class="input-validation" id="diabetesPedigree-validation">Please enter a value between 0.0 and 2.5.</div>
+                                <div class="feature-importance">
+                                    <div class="feature-importance-bar" style="width: 50%;"></div>
+                                </div>
+                                <small>Medium importance factor</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <div class="input-info">
+                                    <label for="age">Age (years)</label>
+                                    <div class="tooltip info-tooltip">
+                                        <span>ℹ️</span>
+                                        <span class="tooltip-text">Age is a risk factor for Type 2 diabetes.</span>
+                                    </div>
+                                </div>
+                                <div class="range-info">Typical range: 20-90</div>
+                                <input type="number" id="age" class="form-control" placeholder="Enter age" required>
+                                <div class="input-validation" id="age-validation">Please enter a value between 20 and 90.</div>
+                                <div class="feature-importance">
+                                    <div class="feature-importance-bar" style="width: 65%;"></div>
+                                </div>
+                                <small>Medium-high importance factor</small>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-bar">
+                            <div class="progress-bar-inner" id="diabetes-progress-bar"></div>
+                        </div>
+                        
+                        <button type="button" id="diabetesPredict" class="btn btn-primary">Predict Risk</button>
+                    </form>
+                    
+                    <div class="result" id="diabetesResult">
+                        <h3 class="result-heading" id="diabetesResultHeading"></h3>
+                        <div class="gauge-container">
+                            <div class="gauge" id="diabetesGauge"></div>
+                            <div class="gauge-value" id="diabetesGaugeValue"></div>
+                        </div>
+                        <p class="result-text" id="diabetesResultText"></p>
+                        
+                        <div class="recommendations" id="diabetesRecommendations">
+                            <h4>Personalized Recommendations</h4>
+                            <ul id="diabetesRecommendationsList">
+                                <!-- Recommendations will be added dynamically -->
+                            </ul>
+                        </div>
+                        
+                        <p class="disclaimer">⚠ Note: This prediction is for educational purposes only. Always consult healthcare professionals for actual medical advice.</p>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="heart">
+                    <div class="model-info">
+                        <h4><i>ℹ️ Model Information</i></h4>
+                        <p>This prediction uses a Support Vector Machine (SVM) algorithm trained on clinical data with an accuracy of 91.3%. The model evaluates 13 cardiac health factors.</p>
+                    </div>

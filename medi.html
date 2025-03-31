@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full-Screen Video Carousel</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="script.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <button onclick="navigate('home')">Home</button>
+        <button onclick="navigate('about')">About</button>
+        <button onclick="navigate('featured')">Featured</button>
+        <button onclick="navigate('prediction')">Prediction</button>
+        <button onclick="navigate('aboutus')">About Us</button>
+    </nav>
+    <div class="carousel-container">
+        <video class="video-slide active" src="4976486-hd_1920_1080_25fps.mp4" autoplay loop muted></video>
+        <video class="video-slide" src="6130551-hd_1920_1080_30fps.mp4" autoplay loop muted></video>
+        <video class="video-slide" src="6997932-hd_1920_1080_25fps.mp4" autoplay loop muted></video>
+    </div>
+
+    <script>
+        let currentIndex = 0;
+        const videos = document.querySelectorAll('.video-slide');
+
+        function showNextVideo() {
+            videos[currentIndex].classList.remove('active');
+            currentIndex = (currentIndex + 1) % videos.length;
+            videos[currentIndex].classList.add('active');
+        }
+        
+        setInterval(showNextVideo, 5000);
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow: hidden;
+        }
+        .navbar {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 10;
+        }
+        .navbar button {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+        }
+        .carousel-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        .video-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .video-slide.active {
+            opacity: 1;
+        }
+    </style>
+</body>
+</html>

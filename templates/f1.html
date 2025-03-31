@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Shield - Disease Prediction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px 0;
+        }
+
+        /* Header */
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo img {
+            width: 50px;
+            margin-right: 10px;
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav a:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        /* Main Content */
+        main {
+            margin-top: 80px;
+            padding-bottom: 50px;
+        }
+
+        /* Prediction Section */
+        .prediction-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .prediction-section h2 {
+            color: #007bff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .disease-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .disease-tab {
+            padding: 10px 20px;
+            background-color: #e9ecef;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .disease-tab.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .disease-tab:first-child {
+            border-radius: 5px 0 0 5px;
+        }
+
+        .disease-tab:last-child {
+            border-radius: 0 5px 5px 0;
+        }
+
+        .prediction-form {
+            display: none;
+        }
+
+        .prediction-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+
+        .info-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        /* Results Section */
+        .results {
+            display: none;
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .risk-high {
+            color: #dc3545;
+        }
+
+        .risk-low {
+            color: #28a745;
+        }
+
+        .risk-moderate {
+            color: #fd7e14;
+        }
+
+        .recommendations {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+
+        .recommendations h4 {
+            margin-top: 0;
+        }
+
+        .recommendations ul {
+            padding-left: 20px;
+        }
+
+        .recommendations li {
+            margin-bottom: 8px;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+        }
+
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header .container {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .nav ul {
+                margin-top: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <!-- <img src="logo.png" alt="Medical Shield Logo"> -->
+                <span>Medical Shield</span>
+            </div>
+            <nav class="nav">
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#prediction">Disease Prediction</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="prediction" class="container">
+            <div class="prediction-section">
+                <h2>Disease Risk Assessment</h2>
+                
+                <div class="disease-selector">
+                    <button class="disease-tab active" data-disease="diabetes">Diabetes</button>
+                    <button class="disease-tab" data-disease="heart">Heart Disease</button>
+                </div>
+                
+                <!-- Diabetes Prediction Form -->
+                <form id="diabetes-form" class="prediction-form active">
+                    <div class="form-group">
+                        <label for="pregnancies">Pregnancies</label>
+                        <input type="number" id="pregnancies" name="pregnancies" min="0" max="17" required>
+                        <p class="info-text">Number of pregnancies (0-17)</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="glucose">Glucose Level</label>
+                        <input type="number" id="glucose" name="glucose" min="70" max="200" required>
+                        <p class="info-text">Fasting blood glucose level (mg/dL). Normal: 70-99, Prediabetes: 100-125, Diabetes: >126</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="blood-pressure">Blood Pressure</label>
+                        <input type="number" id="blood-pressure" name="blood_pressure" min="60" max="140" required>
+                        <p class="info-text">Diastolic blood pressure (mm Hg). Normal: <80, Elevated: 80-89, High: ≥90</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="skin-thickness">Skin Thickness</label>
+                        <input type="number" id="skin-thickness" name="skin_thickness" min="10" max="50" step="0.1" required>
+                        <p class="info-text">Triceps skin fold thickness (mm). Normal range: 10-25</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="insulin">Insulin Level</label>
+                        <input type="number" id="insulin" name="insulin" min="0" max="846" required>
+                        <p class="info-text">2-Hour serum insulin (mu U/ml). Normal: <140, Prediabetes: 140-199, Diabetes: ≥200</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bmi">BMI</label>
+                        <input type="number" id="bmi" name="bmi" min="18.5" max="50" step="0.1" required>
+                        <p class="info-text">Body mass index (kg/m²). Underweight: <18.5, Normal: 18.5-24.9, Overweight: 25-29.9, Obese: ≥30</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pedigree">Diabetes Pedigree Function</label>
+                        <input type="number" id="pedigree" name="pedigree" min="0.078" max="2.42" step="0.001" required>
+                        <p class="info-text">Diabetes pedigree function (genetic score). Higher values indicate stronger family history</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" name="age" min="21" max="90" required>
+                        <p class="info-text">Age in years</p>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-block">Assess Diabetes Risk</button>
+                </form>
+                
+                <!-- Heart Disease Prediction Form -->
+                <form id="heart-form" class="prediction-form">
+                    <div class="form-group">
+                        <label for="heart-age">Age</label>
+                        <input type="number" id="heart-age" name="age" min="25" max="90" required>
+                        <p class="info-text">Age in years. Risk increases with age (men >45, women >55)</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sex">Sex</label>
+                        <select id="sex" name="sex" required>
+                            <option value="">Select sex</option>
+                            <option value="0">Female</option>
+                            <option value="1">Male</option>
+                        </select>
+                        <p class="info-text">Men are generally at higher risk</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cp">Chest Pain Type</label>
+                        <select id="cp" name="cp" required>
+                            <option value="">Select chest pain type</option>
+                            <option value="0">Typical angina (chest pain related to heart)</option>
+                            <option value="1">Atypical angina (non-heart related chest pain)</option>
+                            <option value="2">Non-anginal pain (not related to heart)</option>
+                            <option value="3">Asymptomatic (no symptoms)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="trestbps">Resting Blood Pressure</label>
+                        <input type="number" id="trestbps" name="trestbps" min="90" max="200" required>
+                        <p class="info-text">Normal: <120, Elevated: 120-129, Stage 1 HTN: 130-139, Stage 2 HTN: ≥140</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="chol">Cholesterol Level</label>
+                        <input type="number" id="chol" name="chol" min="100" max="500" required>
+                        <p class="info-text">Serum cholesterol (mg/dl). Desirable: <200, Borderline high: 200-239, High: ≥240</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fbs">Fasting Blood Sugar >120 mg/dl</label>
+                        <select id="fbs" name="fbs" required>
+                            <option value="">Select option</option>
+                            <option value="0">False (normal)</option>
+                            <option value="1">True (elevated)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="restecg">Resting ECG Results</label>
+                        <select id="restecg" name="restecg" required>
+                            <option value="">Select ECG result</option>
+                            <option value="0">Normal</option>
+                            <option value="1">ST-T wave abnormality (may indicate ischemia)</option>
+                            <option value="2">Left ventricular hypertrophy (thickened heart wall)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="thalach">Maximum Heart Rate Achieved</label>
+                        <input type="number" id="thalach" name="thalach" min="70" max="220" required>
+                        <p class="info-text">Age-predicted maximum is roughly 220 - age. Lower values may indicate reduced heart function.</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="exang">Exercise Induced Angina</label>
+                        <select id="exang" name="exang" required>
+                            <option value="">Select option</option>
+                            <option value="0">No chest pain during exercise</option>
+                            <option value="1">Chest pain during exercise</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="oldpeak">ST Depression Induced by Exercise</label>
+                        <input type="number" id="oldpeak" name="oldpeak" min="0" max="6.2" step="0.1" required>
+                        <p class="info-text">Measures heart stress during exercise. Higher values indicate more ischemia.</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="slope">Slope of Peak Exercise ST Segment</label>
+                        <select id="slope" name="slope" required>
+                            <option value="">Select slope</option>
+                            <option value="0">Upsloping (normal)</option>
+                            <option value="1">Flat (may indicate ischemia)</option>
+                            <option value="2">Downsloping (may indicate coronary artery disease)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ca">Number of Major Vessels</label>
+                        <select id="ca" name="ca" required>
+                            <option value="">Select number of vessels (0-4)</option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                        <p class="info-text">Visible on fluoroscopy. Higher numbers indicate more blocked vessels.</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="thal">Thalassemia</label>
+                        <select id="thal" name="thal" required>
+                            <option value="">Select condition</option>
+                            <option value="0">Normal</option>
+                            <option value="1">Fixed defect (scar tissue from prior damage)</option>
+                            <option value="2">Reversible defect (area with reduced blood flow)</option>
+                            <option value="3">Unreported/unknown</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-block">Assess Heart Disease Risk</button>
+                </form>
+                
+                <!-- Results Display -->
+                <div id="results" class="results">
+                    <div class="result-header">
+                        <h3 id="result-title">Assessment Results</h3>
+                        <p id="result-message"></p>
+                        <p id="confidence">Confidence: <span id="confidence-value"></span></p>
+                    </div>
+                    
+                    <div class="recommendations">
+                        <h4>Recommendations</h4>
+                        <ul id="recommendations-list">
+                            <!-- Recommendations will be added here by JavaScript -->
+                        </ul>
+                    </div>
+                    
+                    <button id="new-assessment" class="btn btn-block" style="margin-top: 20px;">Perform New Assessment</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2023 Medical Shield. All rights reserved.</p>
+            <p>This application is for informational purposes only and should not replace professional medical advice.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Tab switching functionality
+            const tabs = document.querySelectorAll('.disease-tab');
+            const forms = document.querySelectorAll('.prediction-form');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs and forms
+                    tabs.forEach(t => t.classList.remove('active'));
+                    forms.forEach(f => f.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding form
+                    this.classList.add('active');
+                    const disease = this.dataset.disease;
+                    document.getElementById(`${disease}-form`).classList.add('active');
+                    
+                    // Hide results when switching tabs
+                    document.getElementById('results').classList.remove('active');
+                });
+            });
+            
+            // Form submission for diabetes
+            document.getElementById('diabetes-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitForm('diabetes');
+            });
+            
+            // Form submission for heart disease
+            document.getElementById('heart-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitForm('heart');
+            });
+            
+            // New assessment button
+            document.getElementById('new-assessment').addEventListener('click', function() {
+                document.getElementById('results').class.classList.remove('active');
+                document.querySelector('.prediction-form.active').reset();
+            });
+            
+            function submitForm(diseaseType) {
+                const form = document.getElementById(`${diseaseType}-form`);
+                const formData = new FormData(form);
+                const data = {};
+                
+                // Convert FormData to plain object
+                formData.forEach((value, key) => {
+                    data[key] = value;
+                });
+                
+                // Show loading state
+                const submitBtn = form.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+                
+                // Simulate API call (replace with actual fetch to your backend)
+                setTimeout(() => {
+                    // This is where you would normally make a fetch request to your backend
+                    // For now, we'll simulate a response
+                    const mockResponse = {
+                        success: true,
+                        disease: diseaseType,
+                        prediction: Math.random() > 0.5 ? 1 : 0,
+                        probability: Math.random().toFixed(2),
+                        recommendations: [
+                            "Consult with a healthcare provider",
+                            "Monitor your condition regularly",
+                            "Maintain a healthy diet",
+                            "Exercise regularly"
+                        ]
+                    };
+                    
+                    // Process the response
+                    processResponse(mockResponse);
+                    
+                    // Reset button
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = diseaseType === 'diabetes' 
+                        ? 'Assess Diabetes Risk' 
+                        : 'Assess Heart Disease Risk';
+                }, 1500);
+                
+                // In a real implementation, you would use fetch():
+                /*
+                fetch(`/predict/${diseaseType}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => processResponse(data))
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = diseaseType === 'diabetes' 
+                        ? 'Assess Diabetes Risk' 
+                        : 'Assess Heart Disease Risk';
+                });
+                */
+            }
+            
+            function processResponse(data) {
+                if (!data.success) {
+                    alert('Prediction failed. Please try again.');
+                    return;
+                }
+                
+                const results = document.getElementById('results');
+                const isHighRisk = data.prediction == 1;
+                const probability = parseFloat(data.probability);
+                
+                // Set result title and message
+                document.getElementById('result-title').textContent = 
+                    `${data.disease === 'diabetes' ? 'Diabetes' : 'Heart Disease'} Assessment Results`;
+                
+                if (isHighRisk) {
+                    document.getElementById('result-message').innerHTML = 
+                        `<span class="risk-high">🚨 High risk detected</span>`;
+                } else {
+                    document.getElementById('result-message').innerHTML = 
+                        `<span class="risk-low">✅ Low risk</span>`;
+                }
+                
+                // Set confidence value
+                const confidenceValue = isHighRisk ? probability : (1 - probability);
+                document.getElementById('confidence-value').textContent = 
+                    `${(confidenceValue * 100).toFixed(1)}%`;
+                
+                // Add recommendations
+                const recommendationsList = document.getElementById('recommendations-list');
+                recommendationsList.innerHTML = '';
+                
+                data.recommendations.forEach(rec => {
+                    const li = document.createElement('li');
+                    li.textContent = rec;
+                    recommendationsList.appendChild(li);
+                });
+                
+                // Show results and scroll to them
+                results.classList.add('active');
+                results.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    </script>
+</body>
+</html>
